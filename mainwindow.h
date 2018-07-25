@@ -23,7 +23,15 @@ private slots:
     void on_startButton_clicked();
 
 private:
+    void initGameTableItems(int rows, int columns);
+    void adjustGameTableItemsSize();
+
+    void initGameTable(int rows, int columns);
+    void adjustGameTableSize();
+
     void InitNextBlockTableItems();
+
+    void adjustGameWindowSize();
 
     Ui::MainWindow *ui;
 };

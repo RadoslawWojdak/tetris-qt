@@ -169,6 +169,9 @@
             <property name="text">
              <string>Adjust window size</string>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
          </layout>
@@ -179,8 +182,11 @@
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="1" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QTableWidget" name="boardTable">
+           <widget class="QTableWidget" name="gameTable">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -196,6 +202,12 @@
             <property name="selectionMode">
              <enum>QAbstractItemView::NoSelection</enum>
             </property>
+            <attribute name="horizontalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -320,9 +332,14 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>columnsLineEdit</tabstop>
+  <tabstop>rowsLineEdit</tabstop>
+  <tabstop>adjustWinSizeCheckBox</tabstop>
+  <tabstop>startButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
