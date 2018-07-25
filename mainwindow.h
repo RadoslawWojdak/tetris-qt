@@ -15,7 +15,16 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_columnsLineEdit_editingFinished();
+
+    void on_rowsLineEdit_editingFinished();
+
+    void on_startButton_clicked();
+
 private:
+    void InitNextBlockTableItems();
+
     Ui::MainWindow *ui;
 };
 
