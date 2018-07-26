@@ -82,12 +82,40 @@ void GameEngine::newBlock()
     block[2][1] = true;
 }
 
+bool GameEngine::isBlockOutside()
+{
+    if (blockPosX < 0)
+        return true;
+
+    if (blockPosX > static_cast<int>(cols) - 4)
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                if (block[i][j] && blockPosX + i >= static_cast<int>(cols))
+                    return true;
+
+    return false;
+}
+
 void GameEngine::moveBlockToTheSide(Direction dir)
 {
     switch(dir)
     {
-    case DIR_LEFT: blockPosX--; break;
-    case DIR_RIGHT: blockPosX++; break;
+    case DIR_LEFT:
+    {
+        blockPosX--;
+        if (isBlockOutside())
+            blockPosX++;
+
+        break;
+    }
+    case DIR_RIGHT:
+    {
+        blockPosX++;
+        if (isBlockOutside())
+            blockPosX--;
+
+        break;
+    }
     default: break;
     }
 }

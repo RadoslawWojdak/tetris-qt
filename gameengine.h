@@ -15,7 +15,7 @@ class GameEngine
     bool block[4][4];
 
     unsigned int rows, cols;
-    unsigned int blockPosX, blockPosY;
+    int blockPosX, blockPosY;
     int level, score;
 
     void clearMap();
@@ -23,6 +23,8 @@ class GameEngine
     void refreshMapWithBlock();
     void clearBlock();
     void newBlock();
+
+    bool isBlockOutside();
 
 public:
     GameEngine(int rows, int columns, int level = 1);
