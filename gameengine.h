@@ -10,7 +10,8 @@ enum Direction
 
 enum BlockType
 {
-    BLOCK_I = 0,
+    BLOCK_NONE = 0,
+    BLOCK_I,
     BLOCK_J,
     BLOCK_L,
     BLOCK_O,
@@ -25,7 +26,7 @@ public:
     static const int MAX_LEVEL;
 
 private:
-    bool **map;
+    BlockType **map; //for colors
     bool block[4][4];
 
     unsigned int rows, cols;
@@ -44,7 +45,7 @@ private:
     void clearFullLines();
 
     BlockType randomBlock() const;
-    bool **getMapWithBlock() const;
+    BlockType **getMapWithBlock() const;
     bool isBlockOutside(bool block[4][4], Direction direction = DIR_NONE) const;
     bool shouldBlockStop(bool block[4][4]) const;
 
@@ -57,12 +58,14 @@ public:
     void rotateBlock();
 
     void getBlockAppearance(BlockType blockType, bool block[4][4]) const;
-    BlockType getNextBlock() const;
+    BlockType **getBoard();
+    BlockType getBlockType() const;
+    BlockType getNextBlockType() const;
+    void setLevel(int level);
     int getLevel() const;
     int getScore() const;
     unsigned int getRows() const;
     unsigned int getColumns() const;
-    bool **getBoard();
 };
 
 #endif // GAMEENGINE_H

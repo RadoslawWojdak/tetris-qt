@@ -13,9 +13,9 @@ GameEngine::GameEngine(int rows, int columns, int level) :
 {
     srand(static_cast<unsigned int>(time(nullptr)));
 
-    map = new bool*[this->cols];
+    map = new BlockType*[this->cols];
     for (unsigned int i = 0; i < this->cols; i++)
-        map[i] = new bool[this->rows];
+        map[i] = new BlockType[this->rows];
 
     clearMap();
 
@@ -34,26 +34,28 @@ void GameEngine::clearMap()
 {
     for (unsigned int i = 0; i < cols; i++)
         for (unsigned int j = 0; j < rows; j++)
-            map[i][j] = false;
+            map[i][j] = BLOCK_NONE;
 }
 
-bool **GameEngine::getMapWithBlock() const
+BlockType **GameEngine::getMapWithBlock() const
 {
-    bool **mapWithBlock = new bool*[cols];
+    BlockType **mapWithBlock = new BlockType*[cols];
     for (int i = 0; i < static_cast<int>(cols); i++)
-        mapWithBlock[i] = new bool[rows];
+        mapWithBlock[i] = new BlockType[rows];
 
     int x = static_cast<int>(blockPosX);
     int y = static_cast<int>(blockPosY);
 
     for (int i = 0; i < static_cast<int>(cols); i++)
+    {
         for (int j = 0; j < static_cast<int>(rows); j++)
         {
             if ((i - x >= 0 && i - x <= 3) && (j - y >= 0 && j - y <= 3) && block[i - x][j - y])
-                mapWithBlock[i][j] = true;
+                mapWithBlock[i][j] = blockType;
             else
                 mapWithBlock[i][j] = map[i][j];
         }
+    }
 
     return mapWithBlock;
 }
@@ -83,7 +85,7 @@ void GameEngine::joinBlockToMap()
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
             if (block[i][j])
-                map[blockPosX + i][blockPosY + j] = true;
+                map[blockPosX + i][blockPosY + j] = blockType;
 }
 
 void GameEngine::pullBoardDown(int line)
@@ -116,7 +118,7 @@ void GameEngine::clearFullLines()
 
 BlockType GameEngine::randomBlock() const
 {
-    return static_cast<BlockType>(rand() % 7);
+    return static_cast<BlockType>(rand() % 7 + 1);
 }
 
 bool GameEngine::isBlockOutside(bool block[4][4], Direction direction) const
@@ -260,10 +262,10 @@ void GameEngine::getBlockAppearance(BlockType blockType, bool block[4][4]) const
     }
     case BLOCK_S:
     {
-        block[1][0] = true;
-        block[2][0] = true;
-        block[0][1] = true;
         block[1][1] = true;
+        block[2][1] = true;
+        block[0][2] = true;
+        block[1][2] = true;
         break;
     }
     case BLOCK_T:
@@ -276,18 +278,34 @@ void GameEngine::getBlockAppearance(BlockType blockType, bool block[4][4]) const
     }
     case BLOCK_Z:
     {
-        block[0][0] = true;
-        block[1][0] = true;
+        block[0][1] = true;
         block[1][1] = true;
-        block[2][1] = true;
+        block[1][2] = true;
+        block[2][2] = true;
         break;
     }
     }
 }
 
-BlockType GameEngine::getNextBlock() const
+BlockType **GameEngine::getBoard()
+{
+    BlockType **mapWithBlock = getMapWithBlock();
+    return mapWithBlock;
+}
+
+BlockType GameEngine::getBlockType() const
+{
+    return blockType;
+}
+
+BlockType GameEngine::getNextBlockType() const
 {
     return nextBlockType;
+}
+
+void GameEngine::setLevel(int level)
+{
+    this->level = level;
 }
 
 int GameEngine::getLevel() const
@@ -308,10 +326,4 @@ unsigned int GameEngine::getRows() const
 unsigned int GameEngine::getColumns() const
 {
     return cols;
-}
-
-bool **GameEngine::getBoard()
-{
-    bool **mapWithBlock = getMapWithBlock();
-    return mapWithBlock;
 }

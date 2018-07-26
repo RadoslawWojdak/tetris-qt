@@ -12,6 +12,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowFlags(Qt::WindowCloseButtonHint | Qt::MSWindowsFixedSizeDialogHint);
 
+    QIntValidator *miniValidator = new QIntValidator(0, 9);
+    ui->startingLevelLineEdit->setValidator(miniValidator);
+
     QIntValidator *validator = new QIntValidator(0, 99);
     ui->columnsLineEdit->setValidator(validator);
     ui->rowsLineEdit->setValidator(validator);
@@ -37,7 +40,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::mainLoop()
 {
-    bool **board = engine->getBoard();
+    BlockType **board = engine->getBoard();
 
     engine->moveBlockToTheSide(direction);
 
@@ -63,10 +66,7 @@ void MainWindow::mainLoop()
     {
         for (int j = 0; j < static_cast<int>(engine->getColumns()); j++)
         {
-            if (board[j][i])
-                ui->gameTable->item(i, j)->setBackground(Qt::red);
-            else
-                ui->gameTable->item(i, j)->setBackground(Qt::white);
+            ui->gameTable->item(i, j)->setBackground(getBlockColor(board[j][i]));
         }
     }
 
@@ -100,6 +100,11 @@ void MainWindow::adjustGameTableItemsSize()
                             QApplication::desktop()->availableGeometry().height() - 64);
         else
             maxSize = QSize(ui->gamePage->width() - 156, ui->gamePage->height() - 20);
+
+        if (ui->gridCheckBox->isChecked())
+            ui->gameTable->setShowGrid(true);
+        else
+            ui->gameTable->setShowGrid(false);
 
         int newSize = (maxSize.width() / columns < maxSize.height() / rows
                        ? maxSize.width() / columns : maxSize.height() / rows);
@@ -152,15 +157,31 @@ void MainWindow::adjustGameWindowSize()
 void MainWindow::refreshNextBlockTable()
 {
     bool nextBlock[4][4];
-    engine->getBlockAppearance(engine->getNextBlock(), nextBlock);
+    engine->getBlockAppearance(engine->getNextBlockType(), nextBlock);
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            ui->nextBlockTable->item(i, j)->setBackground(nextBlock[j][i] ? Qt::red : Qt::white);
+            ui->nextBlockTable->item(i, j)->setBackground(nextBlock[j][i] ? getBlockColor(engine->getNextBlockType())
+                                                                          : Qt::white);
 }
 
 void MainWindow::addMoveBlockDownTime(int level)
 {
     moveBlockDownTime = engine->MAX_LEVEL * 4 - level * 4;
+}
+
+QBrush MainWindow::getBlockColor(BlockType blockType)
+{
+    switch(blockType)
+    {
+    case BLOCK_NONE: return Qt::white;
+    case BLOCK_I: return Qt::red;
+    case BLOCK_L: return Qt::magenta;
+    case BLOCK_J: return Qt::yellow;
+    case BLOCK_O: return Qt::blue;
+    case BLOCK_S: return Qt::cyan;
+    case BLOCK_T: return Qt::green;
+    case BLOCK_Z: return QColor(255,128,0); //Orange
+    }
 }
 
 void MainWindow::on_columnsLineEdit_editingFinished()
@@ -190,7 +211,7 @@ void MainWindow::on_startButton_clicked()
         if (ui->adjustWinSizeCheckBox->isChecked())
             adjustGameWindowSize();
 
-        engine = new GameEngine(rows, cols);
+        engine = new GameEngine(rows, cols, ui->startingLevelLineEdit->text().toInt());
         refreshNextBlockTable();
 
         connect(timer, SIGNAL(timeout()), this, SLOT(mainLoop()));

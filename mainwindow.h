@@ -54,6 +54,8 @@ private:
 
     void addMoveBlockDownTime(int level);
 
+    QBrush getBlockColor(BlockType blockType);
+
 protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
