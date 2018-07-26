@@ -6,7 +6,6 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    direction(DIR_NONE),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -18,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->rowsLineEdit->setValidator(validator);
 
     timer = new QTimer(this);
+    direction = DIR_NONE;
+    keyLeftPressed = false;
+    keyRightPressed = false;
 }
 
 MainWindow::~MainWindow()
@@ -31,7 +33,9 @@ void MainWindow::mainLoop()
 {
     bool **board = engine->getBoard();
 
+    engine->moveBlockToTheSide(direction);
     engine->moveBlockDown();
+    direction = DIR_NONE;
 
     for (int i = 0; i < static_cast<int>(engine->getRows()); i++)
     {
@@ -151,4 +155,29 @@ void MainWindow::on_startButton_clicked()
         connect(timer, SIGNAL(timeout()), this, SLOT(mainLoop()));
         timer->start(50);
     }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (!keyLeftPressed && event->key() == Qt::Key_Left)
+    {
+        keyLeftPressed = true;
+        direction = DIR_LEFT;
+    }
+    if (!keyRightPressed && event->key() == Qt::Key_Right)
+    {
+        keyRightPressed = true;
+        if (direction == DIR_LEFT)
+            direction = DIR_NONE;
+        else
+            direction = DIR_RIGHT;
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Left)
+        keyLeftPressed = false;
+    if (event->key() == Qt::Key_Right)
+        keyRightPressed = false;
 }
