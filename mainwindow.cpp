@@ -52,6 +52,7 @@ void MainWindow::mainLoop()
         engine->moveBlockDown();
         addMoveBlockDownTime(engine->getLevel());
 
+        refreshStats();
         refreshNextBlockTable();
     }
     direction = DIR_NONE;
@@ -154,6 +155,12 @@ void MainWindow::adjustGameWindowSize()
     this->move(0,0);
 }
 
+void MainWindow::refreshStats()
+{
+    ui->levelLabel->setText("Level: " + QString::number(engine->getLevel()));
+    ui->scoreLabel->setText("Score: " + QString::number(engine->getScore()));
+}
+
 void MainWindow::refreshNextBlockTable()
 {
     bool nextBlock[4][4];
@@ -166,7 +173,7 @@ void MainWindow::refreshNextBlockTable()
 
 void MainWindow::addMoveBlockDownTime(int level)
 {
-    moveBlockDownTime = engine->MAX_LEVEL * 4 - level * 4;
+    moveBlockDownTime = static_cast<int>(((engine->MAX_LEVEL * 6) / (level * 0.8)) - 6);
 }
 
 QBrush MainWindow::getBlockColor(BlockType blockType)
@@ -212,10 +219,11 @@ void MainWindow::on_startButton_clicked()
             adjustGameWindowSize();
 
         engine = new GameEngine(rows, cols, ui->startingLevelLineEdit->text().toInt());
+        refreshStats();
         refreshNextBlockTable();
 
         connect(timer, SIGNAL(timeout()), this, SLOT(mainLoop()));
-        timer->start(40);
+        timer->start(60);
         addMoveBlockDownTime(engine->getLevel());
     }
 }

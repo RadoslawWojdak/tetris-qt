@@ -9,7 +9,8 @@ GameEngine::GameEngine(int rows, int columns, int level) :
     rows(static_cast<unsigned int>(rows)),
     cols(static_cast<unsigned int>(columns)),
     level(level),
-    score(0)
+    score(0),
+    clearedLines(0)
 {
     srand(static_cast<unsigned int>(time(nullptr)));
 
@@ -97,6 +98,8 @@ void GameEngine::pullBoardDown(int line)
 
 void GameEngine::clearFullLines()
 {
+    int countClearedLines = 0;
+
     for (int i = static_cast<int>(rows) - 1; i > 0; i--)
     {
         bool isFull = true;
@@ -111,8 +114,20 @@ void GameEngine::clearFullLines()
         if (isFull)
         {
             pullBoardDown(i);
+            countClearedLines++;
             i++;
         }
+    }
+
+    addScore(countClearedLines * countClearedLines * level);
+    clearedLines += countClearedLines;
+
+    static int linesToNextLevel = 10;
+    linesToNextLevel -= countClearedLines;
+    if (linesToNextLevel <= 0)
+    {
+        linesToNextLevel += 10;
+        nextLevel();
     }
 }
 
@@ -303,14 +318,29 @@ BlockType GameEngine::getNextBlockType() const
     return nextBlockType;
 }
 
+void GameEngine::nextLevel()
+{
+    if (++level > MAX_LEVEL)
+        level = MAX_LEVEL;
+}
+
 void GameEngine::setLevel(int level)
 {
     this->level = level;
+    if (this->level > MAX_LEVEL)
+        level = MAX_LEVEL;
+    else if (this->level < 1)
+        level = 1;
 }
 
 int GameEngine::getLevel() const
 {
     return level;
+}
+
+void GameEngine::addScore(int points)
+{
+    score += points;
 }
 
 int GameEngine::getScore() const

@@ -31,7 +31,7 @@ private:
 
     unsigned int rows, cols;
     int blockPosX, blockPosY;
-    int level, score;
+    int level, score, clearedLines;
     BlockType blockType, nextBlockType;
 
 
@@ -53,17 +53,26 @@ public:
     GameEngine(int rows, int columns, int level = 1);
     ~GameEngine();
 
+
     void moveBlockToTheSide(Direction dir);
     void moveBlockDown();
     void rotateBlock();
 
+
     void getBlockAppearance(BlockType blockType, bool block[4][4]) const;
+
     BlockType **getBoard();
+
     BlockType getBlockType() const;
     BlockType getNextBlockType() const;
+
+    void nextLevel();
     void setLevel(int level);
     int getLevel() const;
+
+    void addScore(int points);
     int getScore() const;
+
     unsigned int getRows() const;
     unsigned int getColumns() const;
 };

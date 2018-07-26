@@ -50,6 +50,7 @@ private:
 
     void adjustGameWindowSize();
 
+    void refreshStats();
     void refreshNextBlockTable();
 
     void addMoveBlockDownTime(int level);
