@@ -1,36 +1,34 @@
 #include "gameengine.h"
 
-const int GameEngine::MAX_LEVEL = 100;
+#include <iostream>
+#include <time.h>
+
+const int GameEngine::MAX_LEVEL = 9;
 
 GameEngine::GameEngine(int rows, int columns, int level) :
     rows(static_cast<unsigned int>(rows)),
     cols(static_cast<unsigned int>(columns)),
     level(level),
-    score(0)
+    score(0),
+    nextBlock(randomBlock())
 {
+    srand(static_cast<unsigned int>(time(nullptr)));
+
     map = new bool*[this->cols];
     for (unsigned int i = 0; i < this->cols; i++)
         map[i] = new bool[this->rows];
 
-    mapWithBlock = new bool*[this->cols];
-    for (unsigned int i = 0; i < this->cols; i++)
-        mapWithBlock[i] = new bool[this->rows];
-
     clearMap();
-    clearMapWithBlock();
 
+    nextBlock = randomBlock();
     createNewBlock();
 }
 
 GameEngine::~GameEngine()
 {
     for (unsigned int i = 0; i < cols; i++)
-    {
         delete[] map[i];
-        delete[] mapWithBlock[i];
-    }
     delete[] map;
-    delete[] mapWithBlock;
 }
 
 void GameEngine::clearMap()
@@ -40,16 +38,11 @@ void GameEngine::clearMap()
             map[i][j] = false;
 }
 
-void GameEngine::clearMapWithBlock()
+bool **GameEngine::getMapWithBlock() const
 {
-    for (unsigned int i = 0; i < cols; i++)
-        for (unsigned int j = 0; j < rows; j++)
-            mapWithBlock[i][j] = false;
-}
-
-void GameEngine::refreshMapWithBlock()
-{
-    clearMapWithBlock();
+    bool **mapWithBlock = new bool*[cols];
+    for (int i = 0; i < static_cast<int>(cols); i++)
+        mapWithBlock[i] = new bool[rows];
 
     int x = static_cast<int>(blockPosX);
     int y = static_cast<int>(blockPosY);
@@ -62,6 +55,8 @@ void GameEngine::refreshMapWithBlock()
             else
                 mapWithBlock[i][j] = map[i][j];
         }
+
+    return mapWithBlock;
 }
 
 void GameEngine::clearBlock()
@@ -78,10 +73,9 @@ void GameEngine::createNewBlock()
     blockPosX = cols / 2 - 2;
     blockPosY = 0;
 
-    block[0][0] = true;
-    block[1][0] = true;
-    block[1][1] = true;
-    block[2][1] = true;
+    getBlockAppearance(nextBlock, block);
+
+    nextBlock = randomBlock();
 }
 
 void GameEngine::joinBlockToMap()
@@ -90,6 +84,11 @@ void GameEngine::joinBlockToMap()
         for (int j = 0; j < 4; j++)
             if (block[i][j])
                 map[blockPosX + i][blockPosY + j] = true;
+}
+
+BlockType GameEngine::randomBlock() const
+{
+    return static_cast<BlockType>(rand() % 7);
 }
 
 bool GameEngine::isBlockOutside() const
@@ -152,6 +151,78 @@ void GameEngine::moveBlockDown()
     }
 }
 
+void GameEngine::getBlockAppearance(BlockType blockType, bool block[4][4]) const
+{
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            block[i][j] = false;
+
+    switch(blockType)
+    {
+    case BLOCK_I:
+    {
+        block[0][1] = true;
+        block[1][1] = true;
+        block[2][1] = true;
+        block[3][1] = true;
+        break;
+    }
+    case BLOCK_J:
+    {
+        block[1][0] = true;
+        block[1][1] = true;
+        block[0][2] = true;
+        block[1][2] = true;
+        break;
+    }
+    case BLOCK_L:
+    {
+        block[0][0] = true;
+        block[0][1] = true;
+        block[0][2] = true;
+        block[1][2] = true;
+        break;
+    }
+    case BLOCK_O:
+    {
+        block[0][0] = true;
+        block[0][1] = true;
+        block[1][0] = true;
+        block[1][1] = true;
+        break;
+    }
+    case BLOCK_S:
+    {
+        block[1][0] = true;
+        block[2][0] = true;
+        block[0][1] = true;
+        block[1][1] = true;
+        break;
+    }
+    case BLOCK_T:
+    {
+        block[0][0] = true;
+        block[1][0] = true;
+        block[2][0] = true;
+        block[1][1] = true;
+        break;
+    }
+    case BLOCK_Z:
+    {
+        block[0][0] = true;
+        block[1][0] = true;
+        block[1][1] = true;
+        block[2][1] = true;
+        break;
+    }
+    }
+}
+
+BlockType GameEngine::getNextBlock() const
+{
+    return nextBlock;
+}
+
 int GameEngine::getLevel() const
 {
     return level;
@@ -174,6 +245,6 @@ unsigned int GameEngine::getColumns() const
 
 bool **GameEngine::getBoard()
 {
-    refreshMapWithBlock();
+    bool **mapWithBlock = getMapWithBlock();
     return mapWithBlock;
 }

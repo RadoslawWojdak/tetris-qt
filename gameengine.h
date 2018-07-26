@@ -8,6 +8,17 @@ enum Direction
     DIR_RIGHT
 };
 
+enum BlockType
+{
+    BLOCK_I = 0,
+    BLOCK_J,
+    BLOCK_L,
+    BLOCK_O,
+    BLOCK_S,
+    BLOCK_T,
+    BLOCK_Z
+};
+
 class GameEngine
 {
 public:
@@ -15,21 +26,22 @@ public:
 
 private:
     bool **map;
-    bool **mapWithBlock;
     bool block[4][4];
 
     unsigned int rows, cols;
     int blockPosX, blockPosY;
     int level, score;
+    BlockType nextBlock;
 
     void clearMap();
 
-    void clearMapWithBlock();
-    void refreshMapWithBlock();
+    bool **getMapWithBlock() const;
 
     void clearBlock();
     void createNewBlock();
     void joinBlockToMap();
+
+    BlockType randomBlock() const;
 
     bool isBlockOutside() const;
     bool shouldBlockStop() const;
@@ -41,6 +53,8 @@ public:
     void moveBlockToTheSide(Direction dir);
     void moveBlockDown();
 
+    void getBlockAppearance(BlockType blockType, bool block[4][4]) const;
+    BlockType getNextBlock() const;
     int getLevel() const;
     int getScore() const;
     unsigned int getRows() const;

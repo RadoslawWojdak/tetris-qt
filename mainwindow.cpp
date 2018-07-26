@@ -44,6 +44,8 @@ void MainWindow::mainLoop()
 
         engine->moveBlockDown();
         addMoveBlockDownTime(engine->getLevel());
+
+        refreshNextBlockTable();
     }
     direction = DIR_NONE;
 
@@ -57,6 +59,10 @@ void MainWindow::mainLoop()
                 ui->gameTable->item(i, j)->setBackground(Qt::white);
         }
     }
+
+    for (unsigned int i = 0; i < engine->getColumns(); i++)
+        delete[] board[i];
+    delete[] board;
 }
 
 void MainWindow::initGameTableItems(int rows, int columns)
@@ -121,9 +127,9 @@ void MainWindow::initNextBlockTableItems()
             ui->nextBlockTable->setItem(i, j, new QTableWidgetItem);
 
     for (int i = 0; i < rows; i++)
-        ui->nextBlockTable->setColumnWidth(i, ui->nextBlockTable->width() / 3);
+        ui->nextBlockTable->setColumnWidth(i, ui->nextBlockTable->width() / 4);
     for (int i = 0; i < cols; i++)
-        ui->nextBlockTable->setRowHeight(i, ui->nextBlockTable->height() / 3);
+        ui->nextBlockTable->setRowHeight(i, ui->nextBlockTable->height() / 4);
 }
 
 void MainWindow::adjustGameWindowSize()
@@ -131,6 +137,20 @@ void MainWindow::adjustGameWindowSize()
     this->setGeometry(0, 0, ui->gameTable->maximumWidth() + 160,
                       ui->gameTable->maximumHeight() + 20);
     this->move(0,0);
+}
+
+void MainWindow::refreshNextBlockTable()
+{
+    bool nextBlock[4][4];
+    engine->getBlockAppearance(engine->getNextBlock(), nextBlock);
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            ui->nextBlockTable->item(i, j)->setBackground(nextBlock[j][i] ? Qt::red : Qt::white);
+}
+
+void MainWindow::addMoveBlockDownTime(int level)
+{
+    moveBlockDownTime = engine->MAX_LEVEL * 4 - level * 4;
 }
 
 void MainWindow::on_columnsLineEdit_editingFinished()
@@ -161,16 +181,12 @@ void MainWindow::on_startButton_clicked()
             adjustGameWindowSize();
 
         engine = new GameEngine(rows, cols);
+        refreshNextBlockTable();
 
         connect(timer, SIGNAL(timeout()), this, SLOT(mainLoop()));
-        timer->start(10);
+        timer->start(40);
         addMoveBlockDownTime(engine->getLevel());
     }
-}
-
-void MainWindow::addMoveBlockDownTime(int level)
-{
-    moveBlockDownTime = engine->MAX_LEVEL - level + 3;
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)

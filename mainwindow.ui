@@ -44,12 +44,24 @@
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
            </spacer>
           </item>
           <item row="6" column="0">
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </spacer>
           </item>
@@ -238,14 +250,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>98</width>
-                <height>98</height>
+                <width>100</width>
+                <height>100</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>98</width>
-                <height>98</height>
+                <width>100</width>
+                <height>100</height>
                </size>
               </property>
               <property name="focusPolicy">
@@ -264,10 +276,10 @@
                <enum>QAbstractItemView::NoSelection</enum>
               </property>
               <property name="rowCount">
-               <number>3</number>
+               <number>4</number>
               </property>
               <property name="columnCount">
-               <number>3</number>
+               <number>4</number>
               </property>
               <attribute name="horizontalHeaderVisible">
                <bool>false</bool>
@@ -278,6 +290,8 @@
               <row/>
               <row/>
               <row/>
+              <row/>
+              <column/>
               <column/>
               <column/>
               <column/>

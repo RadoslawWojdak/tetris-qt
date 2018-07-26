@@ -49,6 +49,8 @@ private:
 
     void adjustGameWindowSize();
 
+    void refreshNextBlockTable();
+
     void addMoveBlockDownTime(int level);
 
 protected:
