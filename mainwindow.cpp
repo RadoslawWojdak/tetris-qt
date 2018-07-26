@@ -17,11 +17,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->rowsLineEdit->setValidator(validator);
 
     timer = new QTimer(this);
+
     direction = DIR_NONE;
     immediatelyMoveBlockDown = false;
+    rotate = false;
+
     keyLeftPressed = false;
     keyRightPressed = false;
     keyDownPressed = false;
+    keySpacePressed = false;
 }
 
 MainWindow::~MainWindow()
@@ -48,6 +52,12 @@ void MainWindow::mainLoop()
         refreshNextBlockTable();
     }
     direction = DIR_NONE;
+
+    if (rotate)
+    {
+        rotate = false;
+        engine->rotateBlock();
+    }
 
     for (int i = 0; i < static_cast<int>(engine->getRows()); i++)
     {
@@ -209,6 +219,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         keyDownPressed = true;
         immediatelyMoveBlockDown = true;
     }
+    if (!keyDownPressed && event->key() == Qt::Key_Space)
+    {
+        keySpacePressed = true;
+        rotate = true;
+    }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
@@ -219,4 +234,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
         keyRightPressed = false;
     if (event->key() == Qt::Key_Down)
         keyDownPressed = false;
+    if (event->key() == Qt::Key_Space)
+        keySpacePressed = false;
 }

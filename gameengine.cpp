@@ -9,8 +9,7 @@ GameEngine::GameEngine(int rows, int columns, int level) :
     rows(static_cast<unsigned int>(rows)),
     cols(static_cast<unsigned int>(columns)),
     level(level),
-    score(0),
-    nextBlock(randomBlock())
+    score(0)
 {
     srand(static_cast<unsigned int>(time(nullptr)));
 
@@ -20,7 +19,7 @@ GameEngine::GameEngine(int rows, int columns, int level) :
 
     clearMap();
 
-    nextBlock = randomBlock();
+    nextBlockType = randomBlock();
     createNewBlock();
 }
 
@@ -73,9 +72,10 @@ void GameEngine::createNewBlock()
     blockPosX = cols / 2 - 2;
     blockPosY = 0;
 
-    getBlockAppearance(nextBlock, block);
+    getBlockAppearance(nextBlockType, block);
+    blockType = nextBlockType;
 
-    nextBlock = randomBlock();
+    nextBlockType = randomBlock();
 }
 
 void GameEngine::joinBlockToMap()
@@ -91,21 +91,26 @@ BlockType GameEngine::randomBlock() const
     return static_cast<BlockType>(rand() % 7);
 }
 
-bool GameEngine::isBlockOutside() const
+bool GameEngine::isBlockOutside(bool block[4][4], Direction direction) const
 {
-    if (blockPosX < 0)
-        return true;
+    if (direction != DIR_RIGHT)
+        if (blockPosX < 4)
+            for (int i = 0; i < 4; i++)
+                for (int j = 0; j < 4; j++)
+                    if (block[i][j] && blockPosX + i < 0)
+                        return true;
 
-    if (blockPosX > static_cast<int>(cols) - 4)
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
-                if (block[i][j] && blockPosX + i >= static_cast<int>(cols))
-                    return true;
+    if (direction != DIR_LEFT)
+        if (blockPosX > static_cast<int>(cols) - 4)
+            for (int i = 0; i < 4; i++)
+                for (int j = 0; j < 4; j++)
+                    if (block[i][j] && blockPosX + i >= static_cast<int>(cols))
+                        return true;
 
     return false;
 }
 
-bool GameEngine::shouldBlockStop() const
+bool GameEngine::shouldBlockStop(bool block[4][4]) const
 {
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
@@ -122,7 +127,7 @@ void GameEngine::moveBlockToTheSide(Direction dir)
     case DIR_LEFT:
     {
         blockPosX--;
-        if (isBlockOutside() || shouldBlockStop())
+        if (isBlockOutside(block, DIR_LEFT) || shouldBlockStop(block))
             blockPosX++;
 
         break;
@@ -130,7 +135,7 @@ void GameEngine::moveBlockToTheSide(Direction dir)
     case DIR_RIGHT:
     {
         blockPosX++;
-        if (isBlockOutside() || shouldBlockStop())
+        if (isBlockOutside(block, DIR_RIGHT) || shouldBlockStop(block))
             blockPosX--;
 
         break;
@@ -143,12 +148,45 @@ void GameEngine::moveBlockDown()
 {
     blockPosY++;
 
-    if (shouldBlockStop())
+    if (shouldBlockStop(block))
     {
         blockPosY--;
         joinBlockToMap();
         createNewBlock();
     }
+}
+
+void GameEngine::rotateBlock()
+{
+    int blockSize = 3;
+    if (blockType == BLOCK_O)
+        blockSize = 2;
+    else if (blockType == BLOCK_I)
+        blockSize = 4;
+
+    bool temp[4][4] = {};
+
+    for (int i = 0; i < blockSize; i++)
+        for (int j = 0; j < blockSize; j++)
+            temp[i][j] = block[j][blockSize - i - 1];
+
+    if (isBlockOutside(temp) || shouldBlockStop(temp))
+    {
+        blockPosX++;
+        if (isBlockOutside(temp) || shouldBlockStop(temp))
+        {
+            blockPosX -= 2;
+            if (isBlockOutside(temp) || shouldBlockStop(temp))
+            {
+                blockPosX++;
+                return;
+            }
+        }
+    }
+
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            block[i][j] = temp[i][j];
 }
 
 void GameEngine::getBlockAppearance(BlockType blockType, bool block[4][4]) const
@@ -201,10 +239,10 @@ void GameEngine::getBlockAppearance(BlockType blockType, bool block[4][4]) const
     }
     case BLOCK_T:
     {
-        block[0][0] = true;
-        block[1][0] = true;
-        block[2][0] = true;
+        block[0][1] = true;
         block[1][1] = true;
+        block[2][1] = true;
+        block[1][2] = true;
         break;
     }
     case BLOCK_Z:
@@ -220,7 +258,7 @@ void GameEngine::getBlockAppearance(BlockType blockType, bool block[4][4]) const
 
 BlockType GameEngine::getNextBlock() const
 {
-    return nextBlock;
+    return nextBlockType;
 }
 
 int GameEngine::getLevel() const

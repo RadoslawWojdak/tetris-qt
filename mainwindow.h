@@ -23,7 +23,8 @@ class MainWindow : public QMainWindow
     Direction direction;
     int moveBlockDownTime;
     bool immediatelyMoveBlockDown;
-    bool keyLeftPressed, keyRightPressed, keyDownPressed;
+    bool rotate;
+    bool keyLeftPressed, keyRightPressed, keyDownPressed, keySpacePressed;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

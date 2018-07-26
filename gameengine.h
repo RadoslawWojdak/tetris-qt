@@ -31,7 +31,7 @@ private:
     unsigned int rows, cols;
     int blockPosX, blockPosY;
     int level, score;
-    BlockType nextBlock;
+    BlockType blockType, nextBlockType;
 
     void clearMap();
 
@@ -43,8 +43,8 @@ private:
 
     BlockType randomBlock() const;
 
-    bool isBlockOutside() const;
-    bool shouldBlockStop() const;
+    bool isBlockOutside(bool block[4][4], Direction direction = DIR_NONE) const;
+    bool shouldBlockStop(bool block[4][4]) const;
 
 public:
     GameEngine(int rows, int columns, int level = 1);
@@ -52,6 +52,7 @@ public:
 
     void moveBlockToTheSide(Direction dir);
     void moveBlockDown();
+    void rotateBlock();
 
     void getBlockAppearance(BlockType blockType, bool block[4][4]) const;
     BlockType getNextBlock() const;
