@@ -24,10 +24,12 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    gameengine.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    gameengine.h
 
 FORMS += \
         mainwindow.ui

@@ -2,9 +2,11 @@
 #include "ui_mainwindow.h"
 
 #include <QDesktopWidget>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    direction(DIR_NONE),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -14,11 +16,33 @@ MainWindow::MainWindow(QWidget *parent) :
     QIntValidator *validator = new QIntValidator(0, 99);
     ui->columnsLineEdit->setValidator(validator);
     ui->rowsLineEdit->setValidator(validator);
+
+    timer = new QTimer(this);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete engine;
+    delete timer;
+}
+
+void MainWindow::mainLoop()
+{
+    bool **board = engine->getBoard();
+
+    engine->moveBlockDown();
+
+    for (int i = 0; i < static_cast<int>(engine->getRows()); i++)
+    {
+        for (int j = 0; j < static_cast<int>(engine->getColumns()); j++)
+        {
+            if (board[j][i])
+                ui->gameTable->item(i, j)->setBackground(Qt::red);
+            else
+                ui->gameTable->item(i, j)->setBackground(Qt::white);
+        }
+    }
 }
 
 void MainWindow::initGameTableItems(int rows, int columns)
@@ -73,7 +97,7 @@ void MainWindow::adjustGameTableSize()
                                       ui->gameTable->rowHeight(0) * rows);
 }
 
-void MainWindow::InitNextBlockTableItems()
+void MainWindow::initNextBlockTableItems()
 {
     int cols = ui->nextBlockTable->columnCount();
     int rows = ui->nextBlockTable->rowCount();
@@ -116,10 +140,15 @@ void MainWindow::on_startButton_clicked()
     {
         ui->stackedWidget->setCurrentWidget(ui->gamePage);
 
-        InitNextBlockTableItems();
+        initNextBlockTableItems();
         initGameTable(rows, cols);
 
         if (ui->adjustWinSizeCheckBox->isChecked())
             adjustGameWindowSize();
+
+        engine = new GameEngine(rows, cols);
+
+        connect(timer, SIGNAL(timeout()), this, SLOT(mainLoop()));
+        timer->start(50);
     }
 }
