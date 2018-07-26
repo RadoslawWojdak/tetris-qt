@@ -19,7 +19,7 @@ GameEngine::GameEngine(int rows, int columns, int level) :
     clearMap();
     clearMapWithBlock();
 
-    newBlock();
+    createNewBlock();
 }
 
 GameEngine::~GameEngine()
@@ -57,8 +57,8 @@ void GameEngine::refreshMapWithBlock()
     for (int i = 0; i < static_cast<int>(cols); i++)
         for (int j = 0; j < static_cast<int>(rows); j++)
         {
-            if ((i - x >= 0 && i - x <= 3) && (j - y >= 0 && j - y <= 3))
-                mapWithBlock[i][j] = block[i - x][j - y];
+            if ((i - x >= 0 && i - x <= 3) && (j - y >= 0 && j - y <= 3) && block[i - x][j - y])
+                mapWithBlock[i][j] = true;
             else
                 mapWithBlock[i][j] = map[i][j];
         }
@@ -71,7 +71,7 @@ void GameEngine::clearBlock()
             block[i][j] = false;
 }
 
-void GameEngine::newBlock()
+void GameEngine::createNewBlock()
 {
     clearBlock();
 
@@ -84,7 +84,15 @@ void GameEngine::newBlock()
     block[2][1] = true;
 }
 
-bool GameEngine::isBlockOutside()
+void GameEngine::joinBlockToMap()
+{
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            if (block[i][j])
+                map[blockPosX + i][blockPosY + j] = true;
+}
+
+bool GameEngine::isBlockOutside() const
 {
     if (blockPosX < 0)
         return true;
@@ -98,6 +106,16 @@ bool GameEngine::isBlockOutside()
     return false;
 }
 
+bool GameEngine::shouldBlockStop() const
+{
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            if (block[i][j] && (blockPosY + j >= static_cast<int>(rows) || map[blockPosX + i][blockPosY + j]))
+                return true;
+
+    return false;
+}
+
 void GameEngine::moveBlockToTheSide(Direction dir)
 {
     switch(dir)
@@ -105,7 +123,7 @@ void GameEngine::moveBlockToTheSide(Direction dir)
     case DIR_LEFT:
     {
         blockPosX--;
-        if (isBlockOutside())
+        if (isBlockOutside() || shouldBlockStop())
             blockPosX++;
 
         break;
@@ -113,7 +131,7 @@ void GameEngine::moveBlockToTheSide(Direction dir)
     case DIR_RIGHT:
     {
         blockPosX++;
-        if (isBlockOutside())
+        if (isBlockOutside() || shouldBlockStop())
             blockPosX--;
 
         break;
@@ -125,6 +143,13 @@ void GameEngine::moveBlockToTheSide(Direction dir)
 void GameEngine::moveBlockDown()
 {
     blockPosY++;
+
+    if (shouldBlockStop())
+    {
+        blockPosY--;
+        joinBlockToMap();
+        createNewBlock();
+    }
 }
 
 int GameEngine::getLevel() const

@@ -28,9 +28,11 @@ private:
     void refreshMapWithBlock();
 
     void clearBlock();
-    void newBlock();
+    void createNewBlock();
+    void joinBlockToMap();
 
-    bool isBlockOutside();
+    bool isBlockOutside() const;
+    bool shouldBlockStop() const;
 
 public:
     GameEngine(int rows, int columns, int level = 1);
