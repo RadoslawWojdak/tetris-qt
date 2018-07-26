@@ -17,10 +17,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     Ui::MainWindow *ui;
     GameEngine *engine;
+
     QTimer *timer;
 
     Direction direction;
-    bool keyLeftPressed, keyRightPressed;
+    int moveBlockDownTime;
+    bool immediatelyMoveBlockDown;
+    bool keyLeftPressed, keyRightPressed, keyDownPressed;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -45,6 +48,8 @@ private:
     void initNextBlockTableItems();
 
     void adjustGameWindowSize();
+
+    void addMoveBlockDownTime(int level);
 
 protected:
     void keyPressEvent(QKeyEvent *event);

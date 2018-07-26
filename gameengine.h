@@ -10,6 +10,10 @@ enum Direction
 
 class GameEngine
 {
+public:
+    static const int MAX_LEVEL;
+
+private:
     bool **map;
     bool **mapWithBlock;
     bool block[4][4];
@@ -19,8 +23,10 @@ class GameEngine
     int level, score;
 
     void clearMap();
+
     void clearMapWithBlock();
     void refreshMapWithBlock();
+
     void clearBlock();
     void newBlock();
 

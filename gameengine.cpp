@@ -1,5 +1,7 @@
 #include "gameengine.h"
 
+const int GameEngine::MAX_LEVEL = 100;
+
 GameEngine::GameEngine(int rows, int columns, int level) :
     rows(static_cast<unsigned int>(rows)),
     cols(static_cast<unsigned int>(columns)),

@@ -18,8 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     timer = new QTimer(this);
     direction = DIR_NONE;
+    immediatelyMoveBlockDown = false;
     keyLeftPressed = false;
     keyRightPressed = false;
+    keyDownPressed = false;
 }
 
 MainWindow::~MainWindow()
@@ -34,7 +36,15 @@ void MainWindow::mainLoop()
     bool **board = engine->getBoard();
 
     engine->moveBlockToTheSide(direction);
-    engine->moveBlockDown();
+
+    moveBlockDownTime--;
+    if (moveBlockDownTime <= 0 || immediatelyMoveBlockDown)
+    {
+        immediatelyMoveBlockDown = false;
+
+        engine->moveBlockDown();
+        addMoveBlockDownTime(engine->getLevel());
+    }
     direction = DIR_NONE;
 
     for (int i = 0; i < static_cast<int>(engine->getRows()); i++)
@@ -153,8 +163,14 @@ void MainWindow::on_startButton_clicked()
         engine = new GameEngine(rows, cols);
 
         connect(timer, SIGNAL(timeout()), this, SLOT(mainLoop()));
-        timer->start(50);
+        timer->start(10);
+        addMoveBlockDownTime(engine->getLevel());
     }
+}
+
+void MainWindow::addMoveBlockDownTime(int level)
+{
+    moveBlockDownTime = engine->MAX_LEVEL - level + 3;
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -172,6 +188,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         else
             direction = DIR_RIGHT;
     }
+    if (!keyDownPressed && event->key() == Qt::Key_Down)
+    {
+        keyDownPressed = true;
+        immediatelyMoveBlockDown = true;
+    }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
@@ -180,4 +201,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
         keyLeftPressed = false;
     if (event->key() == Qt::Key_Right)
         keyRightPressed = false;
+    if (event->key() == Qt::Key_Down)
+        keyDownPressed = false;
 }
