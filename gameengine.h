@@ -33,16 +33,18 @@ private:
     int level, score;
     BlockType blockType, nextBlockType;
 
-    void clearMap();
 
-    bool **getMapWithBlock() const;
+    void clearMap();
 
     void clearBlock();
     void createNewBlock();
     void joinBlockToMap();
 
-    BlockType randomBlock() const;
+    void pullBoardDown(int line);
+    void clearFullLines();
 
+    BlockType randomBlock() const;
+    bool **getMapWithBlock() const;
     bool isBlockOutside(bool block[4][4], Direction direction = DIR_NONE) const;
     bool shouldBlockStop(bool block[4][4]) const;
 

@@ -86,6 +86,34 @@ void GameEngine::joinBlockToMap()
                 map[blockPosX + i][blockPosY + j] = true;
 }
 
+void GameEngine::pullBoardDown(int line)
+{
+    for (int i = line; i > 0; i--)
+        for (int j = 0; j < static_cast<int>(cols); j++)
+            map[j][i] = map[j][i - 1];
+}
+
+void GameEngine::clearFullLines()
+{
+    for (int i = static_cast<int>(rows) - 1; i > 0; i--)
+    {
+        bool isFull = true;
+        for (int j = 0; j < static_cast<int>(cols); j++)
+        {
+            if (!map[j][i])
+            {
+                isFull = false;
+                break;
+            }
+        }
+        if (isFull)
+        {
+            pullBoardDown(i);
+            i++;
+        }
+    }
+}
+
 BlockType GameEngine::randomBlock() const
 {
     return static_cast<BlockType>(rand() % 7);
@@ -152,6 +180,7 @@ void GameEngine::moveBlockDown()
     {
         blockPosY--;
         joinBlockToMap();
+        clearFullLines();
         createNewBlock();
     }
 }
