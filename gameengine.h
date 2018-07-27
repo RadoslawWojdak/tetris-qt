@@ -29,6 +29,7 @@ private:
     BlockType **map; //for colors
     bool block[4][4];
 
+    bool gameOver;
     unsigned int rows, cols;
     int blockPosX, blockPosY;
     int level, score, clearedLines;
@@ -60,6 +61,8 @@ public:
 
 
     void getBlockAppearance(BlockType blockType, bool block[4][4]) const;
+
+    bool isGameOver();
 
     BlockType **getBoard();
 

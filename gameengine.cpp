@@ -6,6 +6,7 @@
 const int GameEngine::MAX_LEVEL = 9;
 
 GameEngine::GameEngine(int rows, int columns, int level) :
+    gameOver(false),
     rows(static_cast<unsigned int>(rows)),
     cols(static_cast<unsigned int>(columns)),
     level(level),
@@ -79,6 +80,8 @@ void GameEngine::createNewBlock()
     blockType = nextBlockType;
 
     nextBlockType = randomBlock();
+
+    gameOver = shouldBlockStop(block);
 }
 
 void GameEngine::joinBlockToMap()
@@ -300,6 +303,11 @@ void GameEngine::getBlockAppearance(BlockType blockType, bool block[4][4]) const
         break;
     }
     }
+}
+
+bool GameEngine::isGameOver()
+{
+    return gameOver;
 }
 
 BlockType **GameEngine::getBoard()

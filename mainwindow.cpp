@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    initGameOverLabel();
+
     setWindowFlags(Qt::WindowCloseButtonHint | Qt::MSWindowsFixedSizeDialogHint);
 
     QIntValidator *miniValidator = new QIntValidator(0, 9);
@@ -34,46 +36,53 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete gameOverLabel;
     delete engine;
     delete timer;
 }
 
 void MainWindow::mainLoop()
 {
-    BlockType **board = engine->getBoard();
-
-    engine->moveBlockToTheSide(direction);
-
-    moveBlockDownTime--;
-    if (moveBlockDownTime <= 0 || immediatelyMoveBlockDown)
+    if (!engine->isGameOver())
     {
-        immediatelyMoveBlockDown = false;
+        BlockType **board = engine->getBoard();
 
-        engine->moveBlockDown();
-        addMoveBlockDownTime(engine->getLevel());
+        engine->moveBlockToTheSide(direction);
 
-        refreshStats();
-        refreshNextBlockTable();
-    }
-    direction = DIR_NONE;
-
-    if (rotate)
-    {
-        rotate = false;
-        engine->rotateBlock();
-    }
-
-    for (int i = 0; i < static_cast<int>(engine->getRows()); i++)
-    {
-        for (int j = 0; j < static_cast<int>(engine->getColumns()); j++)
+        moveBlockDownTime--;
+        if (moveBlockDownTime <= 0 || immediatelyMoveBlockDown)
         {
-            ui->gameTable->item(i, j)->setBackground(getBlockColor(board[j][i]));
-        }
-    }
+            immediatelyMoveBlockDown = false;
 
-    for (unsigned int i = 0; i < engine->getColumns(); i++)
-        delete[] board[i];
-    delete[] board;
+            engine->moveBlockDown();
+            addMoveBlockDownTime(engine->getLevel());
+
+            refreshStats();
+            refreshNextBlockTable();
+        }
+        direction = DIR_NONE;
+
+        if (rotate)
+        {
+            rotate = false;
+            engine->rotateBlock();
+        }
+
+        for (int i = 0; i < static_cast<int>(engine->getRows()); i++)
+        {
+            for (int j = 0; j < static_cast<int>(engine->getColumns()); j++)
+            {
+                ui->gameTable->item(i, j)->setBackground(getBlockColor(board[j][i]));
+            }
+        }
+
+        for (unsigned int i = 0; i < engine->getColumns(); i++)
+            delete[] board[i];
+        delete[] board;
+
+        if (engine->isGameOver())
+            showGameOverLabel();
+    }
 }
 
 void MainWindow::initGameTableItems(int rows, int columns)
@@ -155,6 +164,31 @@ void MainWindow::adjustGameWindowSize()
     this->move(0,0);
 }
 
+void MainWindow::initGameOverLabel()
+{
+    gameOverLabel = new QLabel(this);
+    gameOverLabel->setText("GAME OVER");
+    gameOverLabel->setFont(QFont("Arial", 32));
+    gameOverLabel->setAlignment(Qt::AlignCenter);
+
+    QPalette palette = gameOverLabel->palette();
+    palette.setColor(gameOverLabel->foregroundRole(), QColor(196, 0, 0));
+    gameOverLabel->setPalette(palette);
+
+    gameOverLabel->hide();
+}
+
+void MainWindow::showGameOverLabel()
+{
+    gameOverLabel->setFixedSize(size());
+    gameOverLabel->show();
+}
+
+void MainWindow::hideGameOverLabel()
+{
+    gameOverLabel->hide();
+}
+
 void MainWindow::refreshStats()
 {
     ui->levelLabel->setText("Level: " + QString::number(engine->getLevel()));
@@ -180,7 +214,7 @@ QBrush MainWindow::getBlockColor(BlockType blockType)
 {
     switch(blockType)
     {
-    case BLOCK_NONE: return Qt::white;
+    case BLOCK_NONE: return Qt::gray;
     case BLOCK_I: return Qt::red;
     case BLOCK_L: return Qt::magenta;
     case BLOCK_J: return Qt::yellow;

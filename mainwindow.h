@@ -6,6 +6,7 @@
 
 #include <QMainWindow>
 #include <QKeyEvent>
+#include <QLabel>
 #include "gameengine.h"
 
 namespace Ui {
@@ -16,6 +17,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     Ui::MainWindow *ui;
+    QLabel *gameOverLabel;
+
     GameEngine *engine;
 
     QTimer *timer;
@@ -49,6 +52,10 @@ private:
     void initNextBlockTableItems();
 
     void adjustGameWindowSize();
+
+    void initGameOverLabel();
+    void showGameOverLabel();
+    void hideGameOverLabel();
 
     void refreshStats();
     void refreshNextBlockTable();
